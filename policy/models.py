@@ -187,6 +187,13 @@ class PolicyRenewal(core_models.VersionedModel):
     class Meta:
         managed = True
         db_table = "tblPolicyRenewals"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['policy', 'validity_to'],
+                name='unique_policy_validity_to_null',
+                condition=models.Q(validity_to__isnull=True)
+            )
+        ]
 
 
 class PolicyMutation(core_models.UUIDModel, core_models.ObjectMutation):
