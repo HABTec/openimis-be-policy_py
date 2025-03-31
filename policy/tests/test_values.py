@@ -130,7 +130,7 @@ class PolicyValuesTestCase(TestCase):
         policy, warnings = policy_values(policy, head_insuree.family, None, self.user)
         self.assertEquals(policy.start_date, core.datetime.date(2021, 1, 1))
         self.assertEquals(policy.expiry_date, core.datetime.date(2021, 12, 31))
-        self.assertEquals(policy.value, 230)  # 200 + 2 x 10 + 2 x 5
+        self.assertEquals(policy.value, 230)  #  200 + 2 x 10 + 0
 
         # let's add a child (outside threshold)  and shift date in 1st cycle grace period
         child = Relation.objects.get(id=4)

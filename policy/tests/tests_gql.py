@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from core.utils import filter_validity
 from core.models import User
 from core.test_helpers import create_test_interactive_user
-from core.models.openimis_graphql_test_case import openIMISGraphQLTestCase
+from core.models.openimis_graphql_test_case import openIMISGraphQLTestCase, BaseTestContext as DummyContext
+
 
 from django.conf import settings
 from medical.models import Service
@@ -26,11 +27,6 @@ from location.test_helpers import create_test_health_facility, create_test_villa
 from uuid import UUID
 
 
-@dataclass
-class DummyContext:
-    """Just because we need a context to generate."""
-
-    user: User
 
 
 class PolicyGraphQLTestCase(openIMISGraphQLTestCase):
