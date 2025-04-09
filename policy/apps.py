@@ -3,6 +3,14 @@ from django.conf import settings
 import importlib
 import inspect
 
+settings.SCHEDULER_JOBS.append(
+    {
+        "method": "policy.tasks.get_policies_for_renewal",
+        "args": ["cron"],
+        "kwargs": {"id": "openimis_renewal_batch", "hour": 8, "minute": 30, "replace_existing": True},
+    }
+)
+
 MODULE_NAME = "policy"
 
 DEFAULT_CFG = {
