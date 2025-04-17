@@ -8,8 +8,8 @@ from claim.test_helpers import (
 from claim.validations import (
     validate_claim,
     validate_assign_prod_to_claimitems_and_services,
-    process_dedrem,
 )
+from claim.services import processing_claim
 from core.models import InteractiveUser, User
 from core.test_helpers import create_test_officer
 from django.conf import settings
@@ -41,6 +41,8 @@ class EligibilityServiceTestCase(TestCase):
         super(EligibilityServiceTestCase, self).setUp()
         self.user = mock.Mock(is_anonymous=False)
         self.user.has_perms = mock.MagicMock(return_value=True)
+        self.user.id_for_audit = -1
+        
 
     def test_eligibility_request_permission_denied(self):
         with mock.patch("django.db.backends.utils.CursorWrapper") as mock_cursor:
@@ -168,11 +170,9 @@ class EligibilityServiceTestCase(TestCase):
         )
         claim = create_test_claim(custom_props={"insuree_id": insuree.id})
         claim_service = create_test_claimservice(
-            claim, custom_props={"service_id": service.id}
+            claim, custom_props={"service_id": service.id}, product=product
         )
-        errors = validate_claim(claim, True)
-        errors += validate_assign_prod_to_claimitems_and_services(claim)
-        errors += process_dedrem(claim, -1, True)
+        errors = processing_claim(claim, self.user, True)
         self.assertEqual(len(errors), 0)
 
         native_el_svc = NativeEligibilityService(self.user)
@@ -209,17 +209,16 @@ class EligibilityServiceTestCase(TestCase):
         product = create_test_product("ELI1")
         (policy, insuree_policy) = create_test_policy2(product, insuree)
         item = create_test_item("A")
-        item_pl_detail = add_item_to_hf_pricelist(item)
+        
         product_item = create_test_product_item(
             product, item, custom_props={"limit_no_adult": 12}
         )
         claim = create_test_claim(custom_props={"insuree_id": insuree.id})
+        item_pl_detail = add_item_to_hf_pricelist(item, claim.health_facility_id)
         claim_item = create_test_claimitem(
-            claim, "A", custom_props={"item_id": item.id}
+            claim, "A", custom_props={"item_id": item.id}, product=product
         )
-        errors = validate_claim(claim, True)
-        errors += validate_assign_prod_to_claimitems_and_services(claim)
-        errors += process_dedrem(claim, -1, True)
+        errors = processing_claim(claim, self.user, True)
         self.assertEqual(len(errors), 0)
 
         native_el_svc = NativeEligibilityService(self.user)
@@ -257,17 +256,17 @@ class EligibilityServiceTestCase(TestCase):
         product = create_test_product("ELI1")
         (policy, insuree_policy) = create_test_policy2(product, insuree)
         item = create_test_item("A")
-        item_pl_detail = add_item_to_hf_pricelist(item)
+        
         product_item = create_test_product_item(
             product, item, custom_props={"limit_no_adult": 12}
         )
         claim = create_test_claim(custom_props={"insuree_id": insuree.id})
+        item_pl_detail = add_item_to_hf_pricelist(item, claim.health_facility_id)
         claim_item = create_test_claimitem(
-            claim, "A", custom_props={"item_id": item.id}
+            claim, "A", custom_props={"item_id": item.id}, product = product
         )
-        errors = validate_claim(claim, True)
-        errors += validate_assign_prod_to_claimitems_and_services(claim)
-        errors += process_dedrem(claim, -1, True)
+  
+        errors = processing_claim(claim, self.user, True)
         self.assertEqual(len(errors), 0)
 
         native_el_svc = NativeEligibilityService(self.user)
@@ -342,19 +341,18 @@ class EligibilityServiceTestCase(TestCase):
         product = create_test_product("ELI1")
         (policy, insuree_policy) = create_test_policy2(product, insuree)
         item = create_test_item("A")
-        item_pl_detail = add_item_to_hf_pricelist(item)
+        
         product_item = create_test_product_item(
             product, item, custom_props={"limit_no_adult": 12}
         )
         claim = create_test_claim(
             custom_props={"insuree_id": insuree.id, "date_to": None}
         )
+        item_pl_detail = add_item_to_hf_pricelist(item, claim.health_facility_id)
         claim_item = create_test_claimitem(
-            claim, "A", custom_props={"item_id": item.id}
+            claim, "A", custom_props={"item_id": item.id}, product=product
         )
-        errors = validate_claim(claim, True)
-        errors += validate_assign_prod_to_claimitems_and_services(claim)
-        errors += process_dedrem(claim, -1, True)
+        errors = processing_claim(claim, self.user, True)
         self.assertEqual(len(errors), 0)
 
         def signal_before(sender, **kwargs):
