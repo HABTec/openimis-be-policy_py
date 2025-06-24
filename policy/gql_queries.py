@@ -43,6 +43,9 @@ class PolicyGQLType(DjangoObjectType):
             "stage": ["exact"],
             "status": ["exact", "lt", "lte", "gt", "gte"],
             "value": ["exact", "lt", "lte", "gt", "gte"],
+            "insuree_policies__insuree__chf_id": ["exact", "icontains"],
+            "insuree_policies__insuree__last_name": ["icontains"],
+            "insuree_policies__insuree__other_names": ["icontains"],
             **prefix_filterset("product__", ProductGQLType._meta.filter_fields),
             **prefix_filterset("officer__", OfficerGQLType._meta.filter_fields),
         }
