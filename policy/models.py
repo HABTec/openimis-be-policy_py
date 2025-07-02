@@ -40,6 +40,14 @@ class Policy(core_models.VersionedModel):
     start_date = fields.DateField(db_column="StartDate")
     effective_date = fields.DateField(db_column="EffectiveDate", blank=True, null=True)
     expiry_date = fields.DateField(db_column="ExpiryDate", blank=True, null=True)
+    enrolment_period_start_date = fields.DateField(
+        db_column="EnrolmentPeriodStartDate", blank=True, null=True,
+        help_text="Start date of the enrollment period for this policy"
+    )
+    enrolment_period_end_date = fields.DateField(
+        db_column="EnrolmentPeriodEndDate", blank=True, null=True,
+        help_text="End date of the enrollment period for this policy"
+    )
 
     product = models.ForeignKey(
         Product, models.DO_NOTHING, db_column="ProdID", related_name="policies"
