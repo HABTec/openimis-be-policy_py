@@ -24,6 +24,8 @@ class PolicyInputType(OpenIMISMutation.Input):
     enroll_date = graphene.Date(required=True)
     start_date = graphene.Date(required=True)
     expiry_date = graphene.Date(required=True)
+    enrolment_period_start_date = graphene.Date(required=False)
+    enrolment_period_end_date = graphene.Date(required=False)
     value = graphene.Decimal(max_digits=18, decimal_places=2, required=True)
     product_id = graphene.Int(required=True)
     family_id = graphene.Int(required=True)

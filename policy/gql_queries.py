@@ -40,6 +40,8 @@ class PolicyGQLType(DjangoObjectType):
             "start_date": ["exact", "lt", "lte", "gt", "gte"],
             "effective_date": ["exact", "lt", "lte", "gt", "gte"],
             "expiry_date": ["exact", "lt", "lte", "gt", "gte"],
+            "enrolment_period_start_date": ["exact", "lt", "lte", "gt", "gte"],
+            "enrolment_period_end_date": ["exact", "lt", "lte", "gt", "gte"],
             "stage": ["exact"],
             "status": ["exact", "lt", "lte", "gt", "gte"],
             "value": ["exact", "lt", "lte", "gt", "gte"],
@@ -77,6 +79,8 @@ class PolicyByFamilyOrInsureeGQLType(graphene.ObjectType):
     enroll_date = graphene.Date()
     effective_date = graphene.Date()
     expiry_date = graphene.Date()
+    enrolment_period_start_date = graphene.Date()
+    enrolment_period_end_date = graphene.Date()
     officer_code = graphene.String()
     officer_name = graphene.String()
     status = graphene.Int()
