@@ -30,6 +30,7 @@ class PolicyInputType(OpenIMISMutation.Input):
     product_id = graphene.Int(required=True)
     family_id = graphene.Int(required=True)
     officer_id = graphene.Int(required=True)
+    membership_type_id = graphene.Int(required=False)
     is_paid = graphene.Boolean(required=False)
     receipt = graphene.String(required=False)
     payer_uuid = graphene.String(required=False)

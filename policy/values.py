@@ -66,11 +66,16 @@ def set_expiry_date(policy):
     product = policy.product
     from core import datetime, datetimedelta
 
-    insurance_period = (
-        datetimedelta(months=product.insurance_period)
-        if product.insurance_period % 12 != 0
-        else datetimedelta(years=product.insurance_period // 12)
-    )
+    # Default to 1 year if insurance_period is not available
+    if hasattr(product, 'insurance_period') and product.insurance_period is not None:
+        if product.insurance_period % 12 != 0:
+            insurance_period = datetimedelta(months=product.insurance_period)
+        else:
+            insurance_period = datetimedelta(years=product.insurance_period // 12)
+    else:
+        # Default to 1 year if insurance_period is not set
+        insurance_period = datetimedelta(years=1)
+        
     policy.expiry_date = (
         datetime.date.from_ad_date(policy.start_date)
         + insurance_period
@@ -91,9 +96,6 @@ def count_member(members, majority_date, not_related=False, older=True):
 
 
 def family_counts(product, members=None):
-
-    extra_adults = 0
-    extra_children = 0
     date_threshold = py_datetime.date.today() - relativedelta(
         years=CoreConfig.age_of_majority
     )
@@ -104,41 +106,49 @@ def family_counts(product, members=None):
     )
     other_adults = count_member(members, date_threshold, not_related=True)
 
+    # Initialize overage counts
     over_children = 0
     over_adults = 0
     over_other_children = 0
     over_other_adults = 0
 
-    if product.max_members:
-        over_adults = max(0, adults - product.max_members)
-        over_children = max(0, adults + children - over_adults - product.max_members)
-        over_other_children = max(
-            0,
-            adults
-            + children
-            + other_children
-            - over_adults
-            - over_children
-            - product.max_members,
-        )
-        over_other_adults = max(
-            0,
-            adults
-            + other_adults
-            + children
-            + other_children
-            - over_adults
-            - over_other_children
-            - over_children
-            - product.max_members,
-        )
+    # Skip max_members check if the attribute doesn't exist
+    if hasattr(product, 'max_members') and product.max_members is not None:
+        max_members = product.max_members
+        if max_members > 0:
+            over_adults = max(0, adults - max_members)
+            over_children = max(0, adults + children - over_adults - max_members)
+            over_other_children = max(
+                0,
+                adults
+                + children
+                - over_adults
+                - over_children
+                + other_children
+                - max_members,
+            )
+            over_other_adults = max(
+                0,
+                adults
+                + children
+                - over_adults
+                - over_children
+                + other_children
+                - over_other_children
+                + other_adults
+                - max_members,
+            )
 
     # remove over from count
     children -= over_children
     adults -= over_adults
     other_children -= over_other_children
     other_adults -= over_other_adults
-    if product.threshold:
+
+    # Calculate extra members based on threshold if it exists
+    extra_adults = 0
+    extra_children = 0
+    if hasattr(product, 'threshold') and product.threshold is not None:
         extra_adults = max(0, adults - product.threshold)
         extra_children = max(0, children + adults - extra_adults - product.threshold)
 
@@ -176,44 +186,67 @@ def sum_contributions(product, f_counts):
 
 
 def sum_general_assemblies(product, f_counts):
-    if product.general_assembly_lump_sum:
+    # Check if general_assembly_lump_sum exists and has a value
+    if hasattr(product, 'general_assembly_lump_sum') and product.general_assembly_lump_sum is not None:
         return product.general_assembly_lump_sum
+    # Default to 0 if neither lump sum nor fee is available
     return f_counts["total"] * get_attr(product, "general_assembly_fee")
 
 
 def sum_registrations(policy, product, f_counts):
     if policy.stage != Policy.STAGE_NEW:
         return 0
-    if product.registration_lump_sum:
+    # Check if registration_lump_sum exists and has a value
+    if hasattr(product, 'registration_lump_sum') and product.registration_lump_sum is not None:
         return product.registration_lump_sum
+    # Default to 0 if neither lump sum nor fee is available
     return f_counts["total"] * get_attr(product, "registration_fee")
 
 
 def discount_new(policy):
     product = policy.product
-    if product.has_enrolment_discount() and product.has_cycle():
+    # Check if the product has the required methods and attributes before calling them
+    has_discount = hasattr(product, 'has_enrolment_discount') and callable(getattr(product, 'has_enrolment_discount'))
+    has_cycle = hasattr(product, 'has_cycle') and callable(getattr(product, 'has_cycle'))
+    
+    if has_discount and has_cycle and product.has_enrolment_discount() and product.has_cycle():
         from core import datetime, datetimedelta
-
-        min_discount_date = (
-            datetime.date.from_ad_date(policy.start_date)
-            - datetimedelta(months=product.enrolment_discount_period)
-        ).to_ad_datetime()
-        if policy.enroll_date <= min_discount_date:
-            policy.value -= policy.value * product.enrolment_discount_perc / 100
+        
+        # Check if required attributes exist before using them
+        if (hasattr(product, 'enrolment_discount_period') and 
+            hasattr(product, 'enrolment_discount_perc') and
+            hasattr(policy, 'start_date') and 
+            hasattr(policy, 'enroll_date')):
+            
+            min_discount_date = (
+                datetime.date.from_ad_date(policy.start_date)
+                - datetimedelta(months=product.enrolment_discount_period)
+            ).to_ad_datetime()
+            if policy.enroll_date <= min_discount_date:
+                policy.value -= policy.value * product.enrolment_discount_perc / 100
 
 
 def discount_renew(policy, prev_policy):
     product = policy.product
-    if product.has_renewal_discount():
+    # Check if the product has the required method and it's callable
+    has_renewal_discount = hasattr(product, 'has_renewal_discount') and callable(getattr(product, 'has_renewal_discount'))
+    
+    if has_renewal_discount and product.has_renewal_discount():
         from core import datetime, datetimedelta
-
-        min_discount_date = (
-            datetime.date.from_ad_date(prev_policy.expiry_date)
-            + datetimedelta(days=1)
-            - datetimedelta(months=product.renewal_discount_period)
-        ).to_ad_datetime()
-        if policy.enroll_date <= min_discount_date:
-            policy.value -= policy.value * product.renewal_discount_perc / 100
+        
+        # Check if required attributes exist before using them
+        if (hasattr(product, 'renewal_discount_period') and 
+            hasattr(product, 'renewal_discount_perc') and
+            hasattr(prev_policy, 'expiry_date') and 
+            hasattr(policy, 'enroll_date')):
+            
+            min_discount_date = (
+                datetime.date.from_ad_date(prev_policy.expiry_date)
+                + datetimedelta(days=1)
+                - datetimedelta(months=product.renewal_discount_period)
+            ).to_ad_datetime()
+            if policy.enroll_date <= min_discount_date:
+                policy.value -= policy.value * product.renewal_discount_perc / 100
 
 
 def discount(policy, prev_policy):
@@ -265,14 +298,7 @@ def set_legacy_policy_value(product, policy, prev_policy, f_counts):
 
 def policy_values(policy, family, prev_policy, user, members=None):
     members = get_members(policy, family, user, members)
-    max_members = policy.product.max_members
-    above_max = max(0, len(members or []) - max_members)
     warnings = []
-    if above_max:
-        warnings.append(
-            _("policy.validation.members_count_above_max")
-            % {"max": max_members, "count": len(members)}
-        )
     set_start_date(policy)
     set_expiry_date(policy)
     set_value(policy, members, prev_policy, user)

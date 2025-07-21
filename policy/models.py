@@ -12,7 +12,7 @@ from django.conf import settings
 from django.db import models
 from graphql import ResolveInfo
 from insuree.models import Family
-from product.models import Product
+from product.models import Product, MembershipType
 from contribution_plan.models import ContributionPlan
 from django.utils import timezone as django_tz
 from django.db.models.signals import post_save, post_delete
@@ -59,6 +59,15 @@ class Policy(core_models.VersionedModel):
         blank=True,
         null=True,
         related_name="policies",
+    )
+    membership_type = models.ForeignKey(
+        MembershipType,
+        models.DO_NOTHING,
+        db_column="MembershipTypeID",
+        blank=True,
+        null=True,
+        related_name="policies",
+        help_text="Selected membership type for this policy."
     )
 
     offline = models.BooleanField(db_column="isOffline", blank=True, null=True)
