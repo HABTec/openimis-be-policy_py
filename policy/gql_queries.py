@@ -15,6 +15,14 @@ from django.core.exceptions import PermissionDenied
 
 class PolicyGQLType(DjangoObjectType):
     sum_premiums = graphene.Float(source="sum_premiums")
+    membership_type = graphene.Field('product.schema.MembershipTypeGQLType')
+    
+    def resolve_membership_type(self, info):
+        if not info.context.user.has_perms(PolicyConfig.gql_query_policies_perms):
+            raise PermissionDenied(_("unauthorized"))
+        if "membership_type_loader" in info.context.dataloaders and self.membership_type_id:
+            return info.context.dataloaders["membership_type_loader"].load(self.membership_type_id)
+        return self.membership_type
 
     def resolve_family(self, info):
         if not info.context.user.has_perms(PolicyConfig.gql_query_policies_perms):
