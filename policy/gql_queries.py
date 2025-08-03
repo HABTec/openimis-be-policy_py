@@ -83,10 +83,10 @@ class PolicyByFamilyOrInsureeGQLType(graphene.ObjectType):
     policy_value = graphene.Float()
     product_code = graphene.String()
     product_name = graphene.String()
-    start_date = graphene.Date()
+    # start_date = graphene.Date()
     enroll_date = graphene.Date()
     effective_date = graphene.Date()
-    expiry_date = graphene.Date()
+    # expiry_date = graphene.Date()
     enrolment_period_start_date = graphene.Date()
     enrolment_period_end_date = graphene.Date()
     officer_code = graphene.String()
@@ -101,10 +101,10 @@ class PolicyByFamilyOrInsureeGQLType(graphene.ObjectType):
     balance = graphene.Float()
     validity_from = graphene.Date()
     validity_to = graphene.Date()
-    max_installments = graphene.Int()
+    # max_installments = graphene.Int()
     contribution_plan_code = graphene.String()
     contribution_plan_name = graphene.String()
-
+    membershipType = graphene.String()
 
 class PolicyByFamilyOrInsureeConnection(ExtendedRelayConnection):
     class Meta:

@@ -22,11 +22,11 @@ class PolicyInputType(OpenIMISMutation.Input):
     id = graphene.Int(required=False, read_only=True)
     uuid = graphene.String(required=False)
     enroll_date = graphene.Date(required=True)
-    start_date = graphene.Date(required=True)
-    expiry_date = graphene.Date(required=True)
+    # start_date = graphene.Date(required=True)
+    # expiry_date = graphene.Date(required=True)
     enrolment_period_start_date = graphene.Date(required=False)
     enrolment_period_end_date = graphene.Date(required=False)
-    value = graphene.Decimal(max_digits=18, decimal_places=2, required=True)
+    # value = graphene.Decimal(max_digits=18, decimal_places=2, required=True)
     product_id = graphene.Int(required=True)
     family_id = graphene.Int(required=True)
     officer_id = graphene.Int(required=True)
@@ -50,7 +50,9 @@ class CreateRenewOrUpdatePolicyMutation(OpenIMISMutation):
             return errors
         data["audit_user_id"] = user.id_for_audit
         from core.utils import TimeUtils
-
+        data["start_date"] = data['enroll_date']
+        data["expiry_date"] = data['enroll_date']
+        data["value"] = 0
         data["validity_from"] = TimeUtils.now()
         policy = PolicyService(user).update_or_create(data, user)
         logger.info(f"After policy create_or_update: {policy.uuid}")

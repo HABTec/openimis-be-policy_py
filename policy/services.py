@@ -270,7 +270,7 @@ class ByFamilyOrInsureeResponseItem(object):
         balance,
         validity_from,
         validity_to,
-        max_installments,
+        # max_installments,
         contribution_plan_code=None,
         contribution_plan_name=None,
     ):
@@ -295,7 +295,7 @@ class ByFamilyOrInsureeResponseItem(object):
         self.balance = balance
         self.validity_from = validity_from
         self.validity_to = validity_to
-        self.max_installments = max_installments
+        # self.max_installments = max_installments
         self.contribution_plan_code = contribution_plan_code
         self.contribution_plan_name = contribution_plan_name
 
@@ -416,7 +416,7 @@ class FilteredPoliciesService(object):
             balance=balance,
             validity_from=row.validity_from,
             validity_to=row.validity_to,
-            max_installments=row.product.max_installments,
+            # max_installments=row.product.max_installments,
             contribution_plan_code=contribution_plan_code,
             contribution_plan_name=contribution_plan_name,
         )
