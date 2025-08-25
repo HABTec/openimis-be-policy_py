@@ -12,7 +12,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.utils.translation import gettext as _
 from .validations import validate_idle_policy
-
+from product.models import MembershipType
 logger = logging.getLogger(__name__)
 
 
@@ -50,9 +50,10 @@ class CreateRenewOrUpdatePolicyMutation(OpenIMISMutation):
             return errors
         data["audit_user_id"] = user.id_for_audit
         from core.utils import TimeUtils
+        membership = MembershipType.objects.filter(id=data.get("membership_type_id")).first()
         data["start_date"] = data['enroll_date']
         data["expiry_date"] = data['enroll_date']
-        data["value"] = 0
+        data["value"] = membership.price if membership else 0
         data["validity_from"] = TimeUtils.now()
         policy = PolicyService(user).update_or_create(data, user)
         logger.info(f"After policy create_or_update: {policy.uuid}")
