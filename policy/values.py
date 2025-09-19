@@ -204,49 +204,17 @@ def sum_registrations(policy, product, f_counts):
 
 
 def discount_new(policy):
-    product = policy.product
-    # Check if the product has the required methods and attributes before calling them
-    has_discount = hasattr(product, 'has_enrolment_discount') and callable(getattr(product, 'has_enrolment_discount'))
-    has_cycle = hasattr(product, 'has_cycle') and callable(getattr(product, 'has_cycle'))
-    
-    if has_discount and has_cycle and product.has_enrolment_discount() and product.has_cycle():
-        from core import datetime, datetimedelta
-        
-        # Check if required attributes exist before using them
-        if (hasattr(product, 'enrolment_discount_period') and 
-            hasattr(product, 'enrolment_discount_perc') and
-            hasattr(policy, 'start_date') and 
-            hasattr(policy, 'enroll_date')):
-            
-            min_discount_date = (
-                datetime.date.from_ad_date(policy.start_date)
-                - datetimedelta(months=product.enrolment_discount_period)
-            ).to_ad_datetime()
-            if policy.enroll_date <= min_discount_date:
-                policy.value -= policy.value * product.enrolment_discount_perc / 100
+    # Enrolment discount functionality has been removed from the Product model
+    # The enrolment_discount_perc and enrolment_discount_period attributes are no longer available
+    # This function now does nothing but is kept for compatibility
+    pass
 
 
 def discount_renew(policy, prev_policy):
-    product = policy.product
-    # Check if the product has the required method and it's callable
-    has_renewal_discount = hasattr(product, 'has_renewal_discount') and callable(getattr(product, 'has_renewal_discount'))
-    
-    if has_renewal_discount and product.has_renewal_discount():
-        from core import datetime, datetimedelta
-        
-        # Check if required attributes exist before using them
-        if (hasattr(product, 'renewal_discount_period') and 
-            hasattr(product, 'renewal_discount_perc') and
-            hasattr(prev_policy, 'expiry_date') and 
-            hasattr(policy, 'enroll_date')):
-            
-            min_discount_date = (
-                datetime.date.from_ad_date(prev_policy.expiry_date)
-                + datetimedelta(days=1)
-                - datetimedelta(months=product.renewal_discount_period)
-            ).to_ad_datetime()
-            if policy.enroll_date <= min_discount_date:
-                policy.value -= policy.value * product.renewal_discount_perc / 100
+    # Renewal discount functionality has been removed from the Product model
+    # The renewal_discount_perc attribute is no longer available
+    # This function now does nothing but is kept for compatibility
+    pass
 
 
 def discount(policy, prev_policy):

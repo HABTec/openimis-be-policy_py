@@ -109,10 +109,8 @@ class Policy(core_models.VersionedModel):
         return not self.stage or self.stage == Policy.STAGE_NEW
 
     def can_add_insuree(self):
-        return (
-            self.family.members.filter(validity_to__isnull=True).count()
-            < self.product.max_members
-        )
+        # Allow unlimited number of insurees - no maximum limit
+        return True
 
     class Meta:
         managed = True
