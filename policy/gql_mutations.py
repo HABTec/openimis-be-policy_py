@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError, PermissionDenied
 from django.utils.translation import gettext as _
 from .validations import validate_idle_policy
 from product.models import MembershipType
+from product.models import Product
 logger = logging.getLogger(__name__)
 
 
@@ -51,8 +52,12 @@ class CreateRenewOrUpdatePolicyMutation(OpenIMISMutation):
         data["audit_user_id"] = user.id_for_audit
         from core.utils import TimeUtils
         membership = MembershipType.objects.filter(id=data.get("membership_type_id")).first()
-        data["start_date"] = data['enroll_date']
-        data["expiry_date"] = data['enroll_date']
+        product = Product.objects.filter(id=data.get("product_id")).first()
+        if not (product.coverage_period_start_date and product.coverage_period_end_date):
+            raise ValidationError(_("mutation.product_coverage_period_not_set"))
+
+        data["start_date"] = product.coverage_period_start_date
+        data["expiry_date"] = product.coverage_period_end_date
         data["value"] = membership.price if membership else 0
         data["validity_from"] = TimeUtils.now()
         policy = PolicyService(user).update_or_create(data, user)
