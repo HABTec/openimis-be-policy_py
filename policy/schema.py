@@ -149,8 +149,7 @@ class Query(graphene.ObjectType):
                 Product.objects.filter(
                     Q(validity_to__isnull=True),
                     Q(id=product_id) | Q(legacy_id=product_id),
-                    Q(validity_from__date__lte=kwargs.get("enrollDate"))
-                    | Q(date_from__lte=kwargs.get("enrollDate")),
+                    Q(validity_from__date__lte=kwargs.get("enrollDate")),
                 )
                 .order_by("-validity_from")
                 .first()
