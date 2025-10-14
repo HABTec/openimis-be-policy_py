@@ -264,10 +264,20 @@ def set_legacy_policy_value(product, policy, prev_policy, f_counts):
     discount(policy, prev_policy)
 
 
+def set_coverage_period(policy):
+    """Set coverage period dates from product to policy"""
+    product = policy.product
+    if hasattr(product, 'coverage_period_start_date'):
+        policy.coverage_period_start_date = product.coverage_period_start_date
+    if hasattr(product, 'coverage_period_end_date'):
+        policy.coverage_period_end_date = product.coverage_period_end_date
+
+
 def policy_values(policy, family, prev_policy, user, members=None):
     members = get_members(policy, family, user, members)
     warnings = []
     set_start_date(policy)
     set_expiry_date(policy)
+    set_coverage_period(policy)
     set_value(policy, members, prev_policy, user)
     return policy, warnings

@@ -1245,10 +1245,13 @@ def insert_renewals(
                 )
 
         # TODO allow this kind of comparison where the left side is a datetime
-        # if datetime.datetime(product.date_from) <= renewal_date <= product.date_to:
+        # if datetime.datetime(product.validity_from) <= renewal_date <= product.validity_to:
         # noinspection PyChainedComparisons
-        if renewal_date >= product.date_from and renewal_date <= product.date_to:
-            renewal_warning |= 1
+        validity_from_date = product.validity_from.date() if product.validity_from else None
+        validity_to_date = product.validity_to.date() if product.validity_to else None
+        if validity_from_date and validity_to_date:
+            if renewal_date >= validity_from_date and renewal_date <= validity_to_date:
+                renewal_warning |= 1
 
         # This is from the original code but is actually not possible as we have an inner join on it
         if not policy.officer_id:

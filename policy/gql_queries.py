@@ -16,6 +16,24 @@ from django.core.exceptions import PermissionDenied
 class PolicyGQLType(DjangoObjectType):
     sum_premiums = graphene.Float(source="sum_premiums")
     membership_type = graphene.Field('product.schema.MembershipTypeGQLType')
+    coverage_period_start_date = graphene.Date()
+    coverage_period_end_date = graphene.Date()
+    
+    def resolve_coverage_period_start_date(self, info):
+        """Return coverage period start date from product or from policy if set"""
+        if hasattr(self, 'coverage_period_start_date') and self.coverage_period_start_date:
+            return self.coverage_period_start_date
+        if self.product and hasattr(self.product, 'coverage_period_start_date'):
+            return self.product.coverage_period_start_date
+        return None
+    
+    def resolve_coverage_period_end_date(self, info):
+        """Return coverage period end date from product or from policy if set"""
+        if hasattr(self, 'coverage_period_end_date') and self.coverage_period_end_date:
+            return self.coverage_period_end_date
+        if self.product and hasattr(self.product, 'coverage_period_end_date'):
+            return self.product.coverage_period_end_date
+        return None
     
     def resolve_membership_type(self, info):
         if not info.context.user.has_perms(PolicyConfig.gql_query_policies_perms):
