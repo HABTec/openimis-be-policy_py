@@ -1453,9 +1453,6 @@ def update_insuree_policies(policy, user, members=None):
 def policy_status_premium_paid(policy, effective_date):
     if PolicyConfig.activation_option == PolicyConfig.ACTIVATION_OPTION_CONTRIBUTION:
         policy.effective_date = effective_date
-        policy.status = Policy.STATUS_ACTIVE
-    else:
-        policy.status = Policy.STATUS_READY
 
 
 def policy_status_payment_matched(policy):
