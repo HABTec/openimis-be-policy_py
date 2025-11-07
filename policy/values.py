@@ -279,5 +279,11 @@ def policy_values(policy, family, prev_policy, user, members=None):
     set_start_date(policy)
     set_expiry_date(policy)
     set_coverage_period(policy)
+    product = policy.product
+    if hasattr(product, 'coverage_period_start_date'):
+        policy.start_date = product.coverage_period_start_date
+    if hasattr(product, 'coverage_period_end_date'):
+        policy.end_date = product.coverage_period_end_date
+        policy.expiry_date = product.coverage_period_end_date
     set_value(policy, members, prev_policy, user)
     return policy, warnings
