@@ -14,6 +14,7 @@ from django.utils.translation import gettext as _
 from .validations import validate_idle_policy
 from product.models import MembershipType
 from product.models import Product
+from datetime import datetime
 logger = logging.getLogger(__name__)
 
 
@@ -58,6 +59,8 @@ class CreateRenewOrUpdatePolicyMutation(OpenIMISMutation):
 
         data["start_date"] = product.coverage_period_start_date
         data["expiry_date"] = product.coverage_period_end_date
+        if not data["start_date"] <= datetime.now().date() <= data["expiry_date"]:
+            raise ValidationError("Enrollment pariod has ended")
         data["value"] = membership.price if membership else 0
         data["validity_from"] = TimeUtils.now()
         policy = PolicyService(user).update_or_create(data, user)

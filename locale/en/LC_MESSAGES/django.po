@@ -65,3 +65,8 @@ msgstr "On idle policies can be updated"
 #: policy/values.py:178
 msgid "policy.validation.members_count_above_max"
 msgstr "Number of insurees %(count)s is above policy maximum: %(max)s"
+
+#: policy/gql_mutations.py:63
+msgid "mutation.current_date_not_in_product_coverage_period"
+msgstr "The enrollment date has passed"
+
