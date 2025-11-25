@@ -53,12 +53,12 @@ class CreateRenewOrUpdatePolicyMutation(OpenIMISMutation):
         data["audit_user_id"] = user.id_for_audit
         from core.utils import TimeUtils
         membership = MembershipType.objects.filter(id=data.get("membership_type_id")).first()
-        product = Product.objects.filter(id=data.get("product_id")).first()
-        if not (product.coverage_period_start_date and product.coverage_period_end_date):
+        product = Product.objects.filter(validity_to=None , id=data.get("product_id"), ).first()
+        if not (product.enrolment_period_start_date and product.enrolment_period_end_date):
             raise ValidationError(_("mutation.product_coverage_period_not_set"))
 
-        data["start_date"] = product.coverage_period_start_date
-        data["expiry_date"] = product.coverage_period_end_date
+        data["start_date"] = product.enrolment_period_start_date
+        data["expiry_date"] = product.enrolment_period_end_date
         if not data["start_date"] <= datetime.now().date() <= data["expiry_date"]:
             raise ValidationError("Enrollment pariod has ended")
         data["value"] = membership.price if membership else 0
