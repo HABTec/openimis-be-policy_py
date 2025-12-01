@@ -60,7 +60,7 @@ class CreateRenewOrUpdatePolicyMutation(OpenIMISMutation):
         data["start_date"] = product.enrolment_period_start_date
         data["expiry_date"] = product.enrolment_period_end_date
         if not data["start_date"] <= datetime.now().date() <= data["expiry_date"]:
-            raise ValidationError("Enrollment pariod has ended")
+            raise ValidationError("The registration period is currently closed")
         data["value"] = membership.price if membership else 0
         data["validity_from"] = TimeUtils.now()
         policy = PolicyService(user).update_or_create(data, user)
