@@ -90,7 +90,7 @@ class CreatePolicyMutation(CreateRenewOrUpdatePolicyMutation):
     _mutation_class = "CreatePolicyMutation"
 
     class Input(PolicyInputType):
-            pass
+        pass
 
     @classmethod
     def async_mutate(cls, user, **data):
