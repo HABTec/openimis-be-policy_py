@@ -59,7 +59,9 @@ class Policy(core_models.VersionedModel):
         blank=True,
         null=True,
         related_name="policies",
+        help_text="Selected officer for this policy."
     )
+
     membership_type = models.ForeignKey(
         MembershipType,
         models.DO_NOTHING,

@@ -31,7 +31,7 @@ class PolicyInputType(OpenIMISMutation.Input):
     # value = graphene.Decimal(max_digits=18, decimal_places=2, required=True)
     product_id = graphene.Int(required=True)
     family_id = graphene.Int(required=True)
-    officer_id = graphene.Int(required=True)
+    officer_id = graphene.Int(required=False)
     membership_type_id = graphene.Int(required=False)
     is_paid = graphene.Boolean(required=False)
     receipt = graphene.String(required=False)
@@ -90,7 +90,7 @@ class CreatePolicyMutation(CreateRenewOrUpdatePolicyMutation):
     _mutation_class = "CreatePolicyMutation"
 
     class Input(PolicyInputType):
-        pass
+            pass
 
     @classmethod
     def async_mutate(cls, user, **data):
@@ -98,6 +98,7 @@ class CreatePolicyMutation(CreateRenewOrUpdatePolicyMutation):
             with transaction.atomic():
                 data["status"] = Policy.STATUS_IDLE
                 data["stage"] = Policy.STAGE_NEW
+                data["officer_id"] = None
                 return cls.do_mutate(
                     PolicyConfig.gql_mutation_create_policies_perms, user, **data
                 )
