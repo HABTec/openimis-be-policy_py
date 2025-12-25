@@ -246,7 +246,7 @@ class Query(graphene.ObjectType):
             # start_date=item.start_date,
             enroll_date=item.enroll_date,
             effective_date=item.effective_date,
-            # expiry_date=item.expiry_date,
+            expiry_date=item.expiry_date,
             officer_code=item.officer_code,
             officer_name=item.officer_name,
             status=item.status,
